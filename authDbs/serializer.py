@@ -48,7 +48,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.username = validated_data['email']
         user.set_password(validated_data['password'])
         user.save()
-        org = Organisation.objects.create(name=f'{self.firstName}`s organisation')
+        org = Organisation.objects.create(name=f'{user.firstName}`s organisation')
         org.save()
         user.organisation.add(org)
 
@@ -83,3 +83,14 @@ class UserSerializer(serializers.ModelSerializer):
 #       }
 #     }
 #             })
+
+
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        fields = ( 'email',  'password')
+
+
+

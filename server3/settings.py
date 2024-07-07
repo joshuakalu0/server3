@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-2ejr6-p)-(=caw@mxr#5i)ot66r)w4k_*2vt8(j4wt357a#!p*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ["pixmabackend.up.railway.app", "127.0.0.1",'localhost:8000']
+ALLOWED_HOSTS = ['.vercel.app']
+# CSRF_TRUSTED_ORIGINS = ['https://pixmabackend.up.railway.app', 'https://127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['*']
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 
 # Application definition
@@ -42,10 +46,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+     "corsheaders",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -166,3 +172,14 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'server3',
+#         'USER': 'django',
+#         'PASSWORD': 'django',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
+# }

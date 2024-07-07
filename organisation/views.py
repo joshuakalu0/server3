@@ -24,13 +24,23 @@ class UserDetailView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     lookup_field = 'userId'
 
+    def get_queryset(self):
+        orgId = self.kwargs['userId']
+        try:
+            oid = int(orgId)
+        except:
+            oid = orgId
+        if type(oid) ==int:
+            queryset = User.objects.filter(
+            Q(orgId=oid) |
+            Q(pk=oid))
+        else:
+            queryset = User.objects.filter(orgId=oid)
+
     def get(self, request, *args, **kwargs):
         userId = kwargs['userId']
 
-        user = User.objects.filter(
-            Q(userId=userId)|
-            Q(pk=userId)
-        )
+        user = self.get_queryset()
         if user:
             print(user)
             return Response({
@@ -49,43 +59,6 @@ class UserDetailView(generics.RetrieveAPIView):
 
 
         # return super().get(request, *args, **kwargs)
-
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    permission_classes = (AllowAny,)
-    serializer_class = RegisterSerializer
-
-
-    def post(self, request, *args, **kwargs):
-        statu =  self.create(request, *args, **kwargs)
-        if statu.status_code == 201:
-            user = User.objects.get(email = request.data['email'])
-            token = TokenObtainPairSerializer.get_token(user)
-            # org = Organisation.objects.create(name=f'{self.firstName}`s organisation')
-            # user.organisation.add(org)
-
-            return Response({
-                "status": "success",
-                "message": "Registration successful",
-                "data": {
-                      "accessToken":str(token),
-                    "user": {
-                         "userId": user.userId,
-                         "firstName": user.firstName,
-                         "lastName": user.lastName,
-                         "email": user.email,
-                         "phone": user.phone,
-                         }
-                    }
-                },status=status.HTTP_201_CREATED)
-
-
-        return Response({
-            "status": "Bad request",
-            "message": "Registration unsuccessful",
-            "statusCode": 400
-            },status=status.HTTP_400_BAD_REQUEST)
-
 
 
 
@@ -108,6 +81,16 @@ class Orglistview(generics.ListCreateAPIView):
 
                     }
                 },status=status.HTTP_200_OK)
+
+        else:
+            return Response({
+                 "status": "Bad Request",
+                 "message": "Client error",
+                 "statusCode": 400
+
+
+                },status=status.HTTP_400_BAD_REQUEST)
+
 
 
         return super().get(request, *args, **kwargs)
@@ -139,16 +122,27 @@ class Orglistview(generics.ListCreateAPIView):
 
 class OrgDetailView(generics.RetrieveAPIView):
     serializer_class = OrgSerializer
-    queryset = Organisation.objects.all()
+    # queryset = Organisation.objects.all()
+    # lookup_field ='orgId'
+
+    def get_queryset(self):
+        orgId = self.kwargs['orgid']
+        try:
+            oid = int(orgId)
+        except:
+            oid = orgId
+        if type(oid) ==int:
+            queryset = Organisation.objects.filter(
+            Q(orgId=oid) |
+            Q(pk=oid))
+        else:
+            queryset = Organisation.objects.filter(orgId=oid)
 
 
+        return queryset
     def get(self, request, *args, **kwargs):
-        orgId = kwargs['orgId']
-
-        user = Organisation.objects.filter(
-            Q(orgId=orgId)|
-            Q(pk=orgId)
-        )
+        user = self.get_queryset()
+        print(user)
         if user:
             print(user)
             return Response({
@@ -161,6 +155,8 @@ class OrgDetailView(generics.RetrieveAPIView):
                     }
                 },status=status.HTTP_200_OK)
 
+        return Response ({})
+
 
         # return super().get(request, *args, **kwargs)
 
@@ -169,14 +165,24 @@ class addOrgDetailView(generics.RetrieveAPIView):
     serializer_class = OrgSerializer
     queryset = Organisation.objects.all()
 
+    def get_queryset(self):
+        orgId = self.kwargs['orgid']
+        try:
+            oid = int(orgId)
+        except:
+            oid = orgId
+        if type(oid) ==int:
+            queryset = Organisation.objects.filter(
+            Q(orgId=oid) |
+            Q(pk=oid))
+        else:
+            queryset = Organisation.objects.filter(orgId=oid)
+
 
     def get(self, request, *args, **kwargs):
         orgId = kwargs['orgId']
 
-        orgs = Organisation.objects.filter(
-            Q(orgId=orgId)|
-            Q(pk=orgId)
-        )
+        orgs = self.get_queryset()
         request.user.organisation.add(orgs[0])
         if orgs:
             print(orgs)
